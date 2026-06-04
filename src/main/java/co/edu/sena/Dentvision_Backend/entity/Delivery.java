@@ -24,12 +24,12 @@ public class Delivery {
 
     @Column(name = "fecha_entrega")
     private LocalDate fechaEntrega;
-/*
+
     @Column(nullable = false, length = 50)
     private String estado;
     @Column(length = 500)
     private String observaciones;
-*/
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_orden", nullable = false)
     private OrderEntity orden;
