@@ -14,7 +14,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # ---------- ETAPA 2: RUNTIME ----------
-FROM eclipse-temurin:21.0.4-jdk-noble
+FROM eclipse-temurin:21.0.4-jdk-jammy
 
 WORKDIR /app
 
