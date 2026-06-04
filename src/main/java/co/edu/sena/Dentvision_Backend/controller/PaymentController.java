@@ -1,0 +1,49 @@
+package co.edu.sena.Dentvision_Backend.controller;
+
+import co.edu.sena.Dentvision_Backend.dto.payment.PaymentRequest;
+import co.edu.sena.Dentvision_Backend.dto.payment.PaymentResponse;
+import co.edu.sena.Dentvision_Backend.service.PaymentService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/pagos")
+@RequiredArgsConstructor
+public class PaymentController {
+
+    private final PaymentService paymentService;
+
+    @GetMapping
+    public ResponseEntity<List<PaymentResponse>> getAll() {
+        return ResponseEntity.ok(paymentService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PaymentResponse> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(paymentService.findById(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<PaymentResponse> create(@Valid @RequestBody PaymentRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.create(request));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PaymentResponse> update(
+            @PathVariable Long id,
+            @Valid @RequestBody PaymentRequest request
+    ) {
+        return ResponseEntity.ok(paymentService.update(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        paymentService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+}
