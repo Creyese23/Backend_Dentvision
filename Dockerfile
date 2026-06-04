@@ -1,9 +1,9 @@
-# ---------- ETAPA 1: BUILD ----------
-FROM maven:3.9.10-eclipse-temurin-21 AS builder
+---------- ETAPA 1: BUILD ----------
+FROM maven:3.9.9-eclipse-temurin-21 AS builder
 
 WORKDIR /app
 
-# Copiar archivos de configuración primero
+# Copiar archivos de configuración primero (mejora cache)
 COPY pom.xml .
 RUN mvn dependency:go-offline
 
@@ -13,8 +13,9 @@ COPY src ./src
 # Compilar el proyecto (sin tests para mayor rapidez)
 RUN mvn clean package -DskipTests
 
+
 # ---------- ETAPA 2: RUNTIME ----------
-FROM eclipse-temurin:21.0.4-jdk-jammy
+FROM eclipse-temurin:21-jdk-jammy
 
 WORKDIR /app
 
