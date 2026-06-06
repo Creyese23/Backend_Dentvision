@@ -31,7 +31,7 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-
+/*
         if (userRepository.existsByUsername(request.username())) {
             throw new DuplicateResourceException(
                     "El username '" + request.username() + "' ya está registrado");
@@ -40,7 +40,7 @@ public class AuthService {
             throw new DuplicateResourceException(
                     "El email '" + request.email() + "' ya está registrado");
         }
-
+*/
         User user = User.builder()
                 .username(request.username())
                 .email(request.email())
