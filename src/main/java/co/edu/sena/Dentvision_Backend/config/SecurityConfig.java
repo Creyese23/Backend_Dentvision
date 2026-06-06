@@ -32,7 +32,7 @@ public class SecurityConfig {
      * Orígenes permitidos. Se inyectan desde .env / variables de entorno.
      * Ejemplo en .env: CORS_ALLOWED_ORIGINS=http://localhost:5173,https://miapp.com
      */
-    @Value("${cors.allowed-origins:http://localhost:5173,http://localhost:3000}")
+    @Value("${cors.allowed-origins:*")
     private List<String> allowedOrigins;
 
     @Bean
