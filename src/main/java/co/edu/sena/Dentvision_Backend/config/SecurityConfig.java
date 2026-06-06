@@ -33,8 +33,8 @@ public class SecurityConfig {
      * Orígenes permitidos. Se inyectan desde .env / variables de entorno.
      * Ejemplo en .env: CORS_ALLOWED_ORIGINS=
      */
-    @Value("${cors.allowed-origins:*")
-    private List<String> allowedOrigins;
+    //@Value("${cors.allowed-origins:*")
+    //private List<String> allowedOrigins;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
