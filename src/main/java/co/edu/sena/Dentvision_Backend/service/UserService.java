@@ -44,14 +44,6 @@ public class UserService {
                 .estado(request.getEstado() != null ? request.getEstado() : "ACTIVO")
                 .role(request.getRole() != null ? request.getRole() : ROLE_USER)
                 .build();
-
-        if(userRepository.existsByUsername(request.getUsername())) {
-            throw new DuplicateResourceException("El usuario existe en el sistema");
-        }
-        if(userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateResourceException("El email existe en el sistema");
-        }
-
         return mapToResponse(userRepository.save(user));
     }
 
