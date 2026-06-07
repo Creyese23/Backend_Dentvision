@@ -30,11 +30,21 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     /**
-     * Orígenes permitidos inyectados desde .env / variable de entorno.
-     * En .env: CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
-     * En producción: CORS_ALLOWED_ORIGINS=https://mi-dominio.com
+     * Orígenes permitidos leídos del .env via application.properties.
+     *
+     * CORRECCIÓN: se agregaron los puertos reales del frontend Vite:
+     *   - 5173 → puerto default de Vite
+     *   - 5174 → puerto que usa este frontend (host: '127.0.0.1', port: 5174)
+     *   - 5175 → por si Vite incrementa el puerto automáticamente
+     *   - 3000 → servidor Express de presentación (backend/server.js)
+     *
+     * En .env agregar o verificar:
+     *   CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:5174
+     *
+     * Para producción (Render):
+     *   CORS_ALLOWED_ORIGINS=https://tu-frontend.onrender.com
      */
-    @Value("${cors.allowed-origins:http://localhost:5173,http://localhost:3000,http://localhost:5174,http://localhost:5175}")
+    @Value("${cors.allowed-origins:http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:3000}")
     private String allowedOriginsRaw;
 
     @Bean
@@ -43,19 +53,13 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Rutas públicas estrictamente necesarias
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/", "/error").permitAll()
-                        // Swagger UI (solo en dev; en prod puede restringirse)
                         .requestMatchers(
                             "/swagger-ui/**",
                             "/swagger-ui.html",
                             "/v3/api-docs/**"
                         ).permitAll()
-                        // CORRECCIÓN CRÍTICA: /usuarios/** ya NO está en permitAll().
-                        // Antes cualquiera podía crear usuarios, listarlos o cambiar roles
-                        // sin ningún token. Ahora requiere autenticación; el control
-                        // granular se hace con @PreAuthorize en UserController.
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess
@@ -69,9 +73,6 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // CORRECCIÓN CRÍTICA: antes usaba setAllowedOriginPatterns(List.of("*"))
-        // con allowCredentials=true, lo que acepta tokens/cookies desde CUALQUIER
-        // dominio. Ahora se usan los orígenes explícitos del .env.
         List<String> origins = Arrays.stream(allowedOriginsRaw.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isBlank())
@@ -80,8 +81,10 @@ public class SecurityConfig {
         config.setAllowedOrigins(origins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
+        // Exponer Authorization para que el frontend pueda leer el token en headers
         config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(true);
+        // Cache del preflight 1 hora (reduce peticiones OPTIONS repetidas)
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
