@@ -19,15 +19,15 @@ public interface UserMapper {
 
     @Mapping(target = "id",                 ignore = true)
     @Mapping(target = "password",           ignore = true)   // el servicio encodea la contraseña
-    @Mapping(target = "fechaCreacion",      ignore = true)
-    @Mapping(target = "fechaActualizacion", ignore = true)
+    @Mapping(target = "createdAt",      ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "fechaEliminacion",   ignore = true)
     User toEntity(UserRequest request);
 
     @Mapping(target = "id",                 ignore = true)
     @Mapping(target = "password",           ignore = true)
-    @Mapping(target = "fechaCreacion",      ignore = true)
-    @Mapping(target = "fechaActualizacion", ignore = true)
+    @Mapping(target = "createdAt",      ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "fechaEliminacion",   ignore = true)
     void updateEntity(UserRequest request, @MappingTarget User user);
 }

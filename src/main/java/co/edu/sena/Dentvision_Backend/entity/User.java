@@ -46,7 +46,7 @@ public class User {
     @Builder.Default
     private String estado = "ACTIVO";
 
-    @Column(name = "fecha_eliminacin")
+    @Column(name = "fecha_eliminacion")
     private LocalDateTime fechaEliminacion;
 
     @CreatedDate
