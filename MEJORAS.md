@@ -47,7 +47,7 @@ GET /pacientes?page=0&size=20&sort=apellidos&direction=asc
 **Respuesta:**
 ```json
 {
-  "content": [...],
+  "content": ["..."],
   "page": 0,
   "size": 20,
   "totalElements": 150,
@@ -120,7 +120,7 @@ public interface MiEntidadMapper {
 @Slf4j
 @Service
 public class MiServicio {
-    public void create(...) {
+    public void create("...") {
         // lógica...
         log.info("Entidad creada id={}", saved.getId());
     }
