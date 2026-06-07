@@ -1,0 +1,8 @@
+package co.edu.sena.Dentvision_Backend.dto.auth;
+
+import jakarta.validation.constraints.NotBlank;
+
+public record RefreshTokenRequest(
+        @NotBlank(message = "El refresh token es obligatorio")
+        String refreshToken
+) {}

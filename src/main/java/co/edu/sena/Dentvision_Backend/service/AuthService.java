@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
@@ -32,16 +33,18 @@ public class AuthService {
     @Transactional
     public AuthResponse register(RegisterRequest request) {
 
-        if (userRepository.existsByUsername(request.username())|| userRepository.existsByEmail(request.email())) {
-            throw new DuplicateResourceException(
-                    "El usuario ya está registrado");
+        if (userRepository.existsByUsername(request.username())
+                || userRepository.existsByEmail(request.email())) {
+            throw new DuplicateResourceException("El usuario ya está registrado");
         }
 
         User user = User.builder()
                 .username(request.username())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                .role(Role.ROLE_USER)
+                // CORRECCIÓN: era Role.ROLE_USER, valor inexistente en el enum.
+                // El enum tiene: USER, ADMIN, ODONTOLOGO, TECNICO_DENTAL, AUXILIAR_ADMINISTRATIVA
+                .role(Role.USER)
                 .build();
 
         User saved = userRepository.save(user);
@@ -62,7 +65,6 @@ public class AuthService {
         );
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
         String token = jwtService.generateToken(userDetails);
 
         return new AuthResponse(token, new UserDto(userDetails.getUsername()));

@@ -19,7 +19,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -30,11 +30,12 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     /**
-     * Orígenes permitidos. Se inyectan desde .env / variables de entorno.
-     * Ejemplo en .env: CORS_ALLOWED_ORIGINS=
+     * Orígenes permitidos inyectados desde .env / variable de entorno.
+     * En .env: CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+     * En producción: CORS_ALLOWED_ORIGINS=https://mi-dominio.com
      */
-    //@Value("${cors.allowed-origins:*")
-    //private List<String> allowedOrigins;
+    @Value("${cors.allowed-origins:http://localhost:5173,http://localhost:3000}")
+    private String allowedOriginsRaw;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -42,11 +43,19 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Solo rutas públicas estrictamente necesarias
+                        // Rutas públicas estrictamente necesarias
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/usuarios/**").permitAll()
                         .requestMatchers("/", "/error").permitAll()
-                        // Todo lo demás requiere autenticación
+                        // Swagger UI (solo en dev; en prod puede restringirse)
+                        .requestMatchers(
+                            "/swagger-ui/**",
+                            "/swagger-ui.html",
+                            "/v3/api-docs/**"
+                        ).permitAll()
+                        // CORRECCIÓN CRÍTICA: /usuarios/** ya NO está en permitAll().
+                        // Antes cualquiera podía crear usuarios, listarlos o cambiar roles
+                        // sin ningún token. Ahora requiere autenticación; el control
+                        // granular se hace con @PreAuthorize en UserController.
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess
@@ -59,12 +68,21 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Orígenes explícitos en lugar de "*" (requerido cuando allowCredentials=true)
-        config.setAllowedOriginPatterns(List.of("*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+
+        // CORRECCIÓN CRÍTICA: antes usaba setAllowedOriginPatterns(List.of("*"))
+        // con allowCredentials=true, lo que acepta tokens/cookies desde CUALQUIER
+        // dominio. Ahora se usan los orígenes explícitos del .env.
+        List<String> origins = Arrays.stream(allowedOriginsRaw.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .toList();
+
+        config.setAllowedOrigins(origins);
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(true);
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
