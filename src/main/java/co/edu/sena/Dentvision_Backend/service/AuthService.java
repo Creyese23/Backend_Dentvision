@@ -3,7 +3,7 @@ package co.edu.sena.Dentvision_Backend.service;
 import co.edu.sena.Dentvision_Backend.dto.auth.AuthResponse;
 import co.edu.sena.Dentvision_Backend.dto.auth.LoginRequest;
 import co.edu.sena.Dentvision_Backend.dto.auth.RegisterRequest;
-import co.edu.sena.Dentvision_Backend.dto.auth.UserDto;
+import co.edu.sena.Dentvision_Backend.entity.RefreshToken;
 import co.edu.sena.Dentvision_Backend.entity.Role;
 import co.edu.sena.Dentvision_Backend.entity.User;
 import co.edu.sena.Dentvision_Backend.exception.DuplicateResourceException;
@@ -29,6 +29,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final RefreshTokenService refreshTokenService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -42,19 +43,20 @@ public class AuthService {
                 .username(request.username())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
-                // CORRECCIÓN: era Role.ROLE_USER, valor inexistente en el enum.
-                // El enum tiene: USER, ADMIN, ODONTOLOGO, TECNICO_DENTAL, AUXILIAR_ADMINISTRATIVA
                 .role(Role.USER)
                 .build();
 
         User saved = userRepository.save(user);
 
         UserDetails userDetails = buildUserDetails(saved);
-        String token = jwtService.generateToken(userDetails);
+        String accessToken = jwtService.generateToken(userDetails);
+        RefreshToken refreshToken = refreshTokenService.create(saved);
 
-        return new AuthResponse(token, new UserDto(saved.getUsername()));
+        return AuthResponse.of(accessToken, refreshToken.getToken(),
+                jwtService.getExpirationMs());
     }
 
+    @Transactional
     public AuthResponse login(LoginRequest request) {
 
         Authentication authentication = authenticationManager.authenticate(
@@ -65,9 +67,15 @@ public class AuthService {
         );
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String token = jwtService.generateToken(userDetails);
+        String accessToken = jwtService.generateToken(userDetails);
 
-        return new AuthResponse(token, new UserDto(userDetails.getUsername()));
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        RefreshToken refreshToken = refreshTokenService.create(user);
+
+        return AuthResponse.of(accessToken, refreshToken.getToken(),
+                jwtService.getExpirationMs());
     }
 
     private UserDetails buildUserDetails(User user) {
