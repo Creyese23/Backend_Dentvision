@@ -56,9 +56,4 @@ public class Employee {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    // Un empleado puede tener hasta 3 roles: ODONTOLOGO, TECNICO_DENTAL, AUXILIAR_ADMINISTRATIVA
-    @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<EmployeeRole> roles = new ArrayList<>();
 }

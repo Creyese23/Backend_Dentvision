@@ -1,96 +1,119 @@
 package co.edu.sena.Dentvision_Backend.service;
 
+import co.edu.sena.Dentvision_Backend.dto.common.PageResponse;
 import co.edu.sena.Dentvision_Backend.dto.patient.PatientRequest;
 import co.edu.sena.Dentvision_Backend.dto.patient.PatientResponse;
 import co.edu.sena.Dentvision_Backend.entity.Patient;
 import co.edu.sena.Dentvision_Backend.entity.User;
 import co.edu.sena.Dentvision_Backend.exception.ResourceNotFoundException;
+import co.edu.sena.Dentvision_Backend.mapper.PatientMapper;
 import co.edu.sena.Dentvision_Backend.repository.PatientRepository;
 import co.edu.sena.Dentvision_Backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * Servicio de gestión de pacientes.
+ *
+ * Cambios respecto a la versión original:
+ * 1. Usa {@link PatientMapper} (MapStruct) — elimina el método mapToResponse() manual.
+ * 2. {@code findAll(Pageable)} devuelve {@link PageResponse} para paginación.
+ * 3. {@code findAll()} sin parámetros sigue disponible para compatibilidad.
+ * 4. Logs con SLF4J (@Slf4j) en operaciones clave.
+ */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class PatientService {
 
     private final PatientRepository patientRepository;
-    private final UserRepository userRepository;
+    private final UserRepository    userRepository;
+    private final PatientMapper     patientMapper;          // inyectado por MapStruct + Spring
 
+    // ─── Consultas ────────────────────────────────────────────────────────────
+
+    /** Lista todos los pacientes sin paginar (mantiene compatibilidad). */
+    @Transactional(readOnly = true)
     public List<PatientResponse> findAll() {
-        return patientRepository.findAll().stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+        log.debug("Consultando todos los pacientes");
+        return patientRepository.findAll()
+                .stream()
+                .map(patientMapper::toResponse)
+                .toList();
     }
 
-    public PatientResponse findById(Long id) {
-        Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Paciente no encontrado con id " + id));
-        return mapToResponse(patient);
+    /**
+     * Lista pacientes con paginación.
+     *
+     * Ejemplo de llamada desde el controlador:
+     * <pre>
+     *   Pageable pageable = PageRequest.of(page, size, Sort.by("apellidos"));
+     *   return patientService.findAll(pageable);
+     * </pre>
+     */
+    @Transactional(readOnly = true)
+    public PageResponse<PatientResponse> findAll(Pageable pageable) {
+        log.debug("Consultando pacientes — página {}, tamaño {}", pageable.getPageNumber(), pageable.getPageSize());
+        Page<PatientResponse> page = patientRepository.findAll(pageable)
+                .map(patientMapper::toResponse);
+        return PageResponse.of(page);
     }
+
+    @Transactional(readOnly = true)
+    public PatientResponse findById(Long id) {
+        log.debug("Buscando paciente id={}", id);
+        return patientMapper.toResponse(findEntityById(id));
+    }
+
+    // ─── Escritura ────────────────────────────────────────────────────────────
 
     public PatientResponse create(PatientRequest request) {
         User user = userRepository.findById(request.idUsuario())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id " + request.idUsuario()));
 
-        Patient patient = Patient.builder()
-                .user(user)
-                .nombres(request.nombres())
-                .apellidos(request.apellidos())
-                .documento(request.documento())
-                .telefono(request.telefono())
-                .direccion(request.direccion())
-                .fechaNacimiento(request.fechaNacimiento())
-                .estado("ACTIVO")
-                .build();
+        Patient patient = patientMapper.toEntity(request);
+        patient.setUser(user);
+        patient.setEstado("ACTIVO");
 
-        return mapToResponse(patientRepository.save(patient));
+        Patient saved = patientRepository.save(patient);
+        log.info("Paciente creado id={}, documento={}", saved.getId(), saved.getDocumento());
+        return patientMapper.toResponse(saved);
     }
 
     public PatientResponse update(Long id, PatientRequest request) {
-        Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Paciente no encontrado con id " + id));
-
+        Patient patient = findEntityById(id);
         User user = userRepository.findById(request.idUsuario())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id " + request.idUsuario()));
 
+        patientMapper.updateEntity(request, patient);   // actualización parcial via MapStruct
         patient.setUser(user);
-        patient.setNombres(request.nombres());
-        patient.setApellidos(request.apellidos());
-        patient.setDocumento(request.documento());
-        patient.setTelefono(request.telefono());
-        patient.setDireccion(request.direccion());
-        patient.setFechaNacimiento(request.fechaNacimiento());
 
-        return mapToResponse(patientRepository.save(patient));
+        Patient saved = patientRepository.save(patient);
+        log.info("Paciente actualizado id={}", saved.getId());
+        return patientMapper.toResponse(saved);
     }
 
+    /** Baja lógica: cambia estado a INACTIVO y registra fecha de eliminación. */
     public void delete(Long id) {
-        Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Paciente no encontrado con id " + id));
+        Patient patient = findEntityById(id);
         patient.setEstado("INACTIVO");
+        patient.setFechaEliminacion(LocalDateTime.now());
         patientRepository.save(patient);
+        log.info("Paciente desactivado id={}", id);
     }
 
-    private PatientResponse mapToResponse(Patient patient) {
-        return new PatientResponse(
-                patient.getId(),
-                patient.getUser() != null ? patient.getUser().getId() : null,
-                patient.getNombres(),
-                patient.getApellidos(),
-                patient.getDocumento(),
-                patient.getTelefono(),
-                patient.getDireccion(),
-                patient.getFechaNacimiento(),
-                patient.getEstado(),
-                patient.getFechaCreacion(),
-                patient.getFechaActualizacion(),
-                patient.getFechaEliminacion()
-        );
+    // ─── Helpers privados ─────────────────────────────────────────────────────
+
+    private Patient findEntityById(Long id) {
+        return patientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Paciente no encontrado con id " + id));
     }
 }

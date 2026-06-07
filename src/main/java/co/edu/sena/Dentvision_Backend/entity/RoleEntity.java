@@ -3,6 +3,18 @@ package co.edu.sena.Dentvision_Backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+/**
+ * Entidad JPA para la tabla `roles` de empleados.
+ *
+ * CORRECCIÓN: RoleService y data.sql referenciaban una tabla `roles` con una
+ * entidad JPA llamada RoleEntity que no existía. Se crea aquí para que
+ * RoleService, RoleEntityRepository y el seed de data.sql funcionen
+ * correctamente.
+ *
+ * NOTA: Esta entidad es distinta del enum Role (que define los roles de
+ * usuario del sistema). RoleEntity representa los roles clínicos/laborales
+ * que se asignan a los empleados (ODONTOLOGO, TECNICO_DENTAL, etc.).
+ */
 @Entity
 @Table(name = "roles")
 @Getter
@@ -12,23 +24,18 @@ import lombok.*;
 @Builder
 public class RoleEntity {
 
-    /**
-     * Roles válidos para un empleado dental.
-     * Usar enum garantiza que solo se puedan insertar estos tres valores,
-     * evitando inconsistencias como "odontólogo", "Odontologo", "odontologo", etc.
-     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "nombre_rol", nullable = false, unique = true, length = 50)
+    private NombreRol nombreRol;
+
+    /** Roles clínicos/laborales disponibles para empleados. */
     public enum NombreRol {
         ODONTOLOGO,
         TECNICO_DENTAL,
         AUXILIAR_ADMINISTRATIVA
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    // Se almacena como String en la BD (ej: "ODONTOLOGO"), no como índice numérico
-    @Enumerated(EnumType.STRING)
-    @Column(name = "nombre_rol", nullable = false, length = 30, unique = true)
-    private NombreRol nombreRol;
 }
