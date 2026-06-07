@@ -5,12 +5,12 @@ import lombok.*;
 
 /**
  * Entidad JPA para la tabla `roles` de empleados.
- *
+ * <p>
  * CORRECCIÓN: RoleService y data.sql referenciaban una tabla `roles` con una
  * entidad JPA llamada RoleEntity que no existía. Se crea aquí para que
  * RoleService, RoleEntityRepository y el seed de data.sql funcionen
  * correctamente.
- *
+ * <p>
  * NOTA: Esta entidad es distinta del enum Role (que define los roles de
  * usuario del sistema). RoleEntity representa los roles clínicos/laborales
  * que se asignan a los empleados (ODONTOLOGO, TECNICO_DENTAL, etc.).
