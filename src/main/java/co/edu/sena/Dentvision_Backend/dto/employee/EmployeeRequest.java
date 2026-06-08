@@ -33,7 +33,7 @@ public class EmployeeRequest {
 
     @NotBlank(message = "El documento es requerido")
     @Size(min = 5, max = 50, message = "El documento debe tener entre 5 y 50 caracteres")
-    private String documento;
+    private String identificacion;
 
     @Size(max = 40, message = "El teléfono no puede exceder 40 caracteres")
     private String telefono;

@@ -46,7 +46,7 @@ public class EmployeeService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Usuario no encontrado con id " + request.getIdUsuario()));
 
-        if (employeeRepository.findByUserUsername(user.getIdentificacion()).isPresent()) {
+        if (employeeRepository.findByIdentificacion(user.getIdentificacion()).isPresent()) {
             throw new DuplicateResourceException(
                     "El usuario ya tiene un perfil de empleado asignado");
         }
@@ -55,7 +55,7 @@ public class EmployeeService {
                 .user(user)
                 .nombres(request.getNombres())
                 .apellidos(request.getApellidos())
-                .documento(request.getDocumento())
+                .identificacion(request.getIdentificacion())
                 .telefono(request.getTelefono())
                 .especialidad(request.getEspecialidad())
                 .estado(request.getEstado() != null ? request.getEstado() : "ACTIVO")
@@ -71,7 +71,7 @@ public class EmployeeService {
 
         employee.setNombres(request.getNombres());
         employee.setApellidos(request.getApellidos());
-        employee.setDocumento(request.getDocumento());
+        employee.setIdentificacion(request.getIdentificacion());
         employee.setTelefono(request.getTelefono());
         if (request.getEstado() != null) {
             employee.setEstado(request.getEstado());
@@ -94,7 +94,7 @@ public class EmployeeService {
                 .idUsuario(employee.getUser() != null ? employee.getUser().getId() : null)
                 .nombres(employee.getNombres())
                 .apellidos(employee.getApellidos())
-                .documento(employee.getDocumento())
+                .identificacion(employee.getIdentificacion())
                 .telefono(employee.getTelefono())
                 .estado(employee.getEstado())
                 .build();

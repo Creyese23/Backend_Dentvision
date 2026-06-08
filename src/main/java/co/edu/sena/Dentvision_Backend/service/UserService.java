@@ -36,7 +36,7 @@ public class UserService {
     }
 
     public UserResponse create(UserRequest request) {
-        if (userRepository.existsByUsername(request.getIdentificacion()) || userRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByIdentificacion(request.getIdentificacion()) || userRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException(
                     "Ya existe este usuario");
         }

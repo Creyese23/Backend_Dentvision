@@ -19,7 +19,7 @@ public class EmployeeResponse {
     private Long idUsuario;
     private String nombres;
     private String apellidos;
-    private String documento;
+    private String identificacion;
     private String telefono;
     private String especialidad;
     private String estado;
