@@ -57,6 +57,7 @@ public class EmployeeService {
                 .apellidos(request.getApellidos())
                 .documento(request.getDocumento())
                 .telefono(request.getTelefono())
+                .especialidad(request.getEspecialidad())
                 .estado(request.getEstado() != null ? request.getEstado() : "ACTIVO")
                 .build();
 

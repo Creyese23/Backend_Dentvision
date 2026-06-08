@@ -18,7 +18,10 @@ import java.time.LocalDateTime;
 public class UserResponse {
 
     private Long id;
-    private String username;
+    private String tipoIdentificacion;
+    private String identificacion;
+    private String nombres;
+    private String apellidos;
     private String email;
     private String role;
     private String estado;

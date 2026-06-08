@@ -36,13 +36,13 @@ public class UserService {
     }
 
     public UserResponse create(UserRequest request) {
-        if (userRepository.existsByUsername(request.getUsername()) || userRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByUsername(request.getIdentificacion()) || userRepository.existsByEmail(request.getEmail())) {
             throw new DuplicateResourceException(
                     "Ya existe este usuario");
         }
 
         User user = User.builder()
-                .username(request.getUsername())
+                .identificacion(request.getIdentificacion())
                 .email(request.getEmail())
                 .password(hashPassword(request.getPassword()))
                 .estado(request.getEstado() != null ? request.getEstado() : "ACTIVO")
@@ -65,7 +65,7 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
-        user.setUsername(request.getUsername());
+        user.setIdentificacion(request.getIdentificacion());
         user.setEmail(request.getEmail());
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(hashPassword(request.getPassword()));
@@ -109,7 +109,8 @@ public class UserService {
     private UserResponse mapToResponse(User user) {
         return UserResponse.builder()
                 .id(user.getId())
-                .username(user.getUsername())
+                .tipoIdentificacion(user.getTipoIdentificacion())
+                .identificacion(user.getIdentificacion())
                 .email(user.getEmail())
                 .role(user.getRole() != null ? user.getRole().name() : null)
                 .estado(user.getEstado())
