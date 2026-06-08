@@ -45,6 +45,10 @@ public class Employee {
     @Builder.Default
     private String estado = "ACTIVO";
 
+    @Column(length = 40)
+    private String especialidad;
+
+
     // Soft delete: se registra la fecha en lugar de borrar físicamente
     @Column(name = "fecha_eliminacion")
     private LocalDateTime fechaEliminacion;

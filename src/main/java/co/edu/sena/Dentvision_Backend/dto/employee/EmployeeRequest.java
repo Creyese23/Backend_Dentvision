@@ -38,5 +38,8 @@ public class EmployeeRequest {
     @Size(max = 40, message = "El teléfono no puede exceder 40 caracteres")
     private String telefono;
 
+    @Size(max = 40, message = "El teléfono no puede exceder 40 caracteres")
+    private String especialidad;
+
     private String estado;
 }

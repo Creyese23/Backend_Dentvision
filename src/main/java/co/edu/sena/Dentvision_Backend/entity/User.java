@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "usuarios", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_usuarios_username", columnNames = "username"),
+        @UniqueConstraint(name = "uk_usuarios_username", columnNames = "identificacion"),
         @UniqueConstraint(name = "uk_usuarios_email", columnNames = "email")
 })
 @Getter
@@ -30,7 +30,17 @@ public class User {
     private Long id;
 
     @Column(nullable = false, length = 60)
-    private String username;
+    private String tipoIdentificacion;
+
+    @Column(nullable = false, length = 60)
+    private String identificacion;
+
+
+    @Column(nullable = false, length = 60)
+    private String nombres;
+
+    @Column(nullable = false, length = 60)
+    private String apellidos;
 
     @Column(nullable = false, length = 120)
     private String email;

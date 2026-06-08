@@ -78,7 +78,7 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
         RefreshToken rt          = refreshTokenService.validate(request.refreshToken());
-        UserDetails  userDetails = userDetailsService.loadUserByUsername(rt.getUser().getUsername());
+        UserDetails  userDetails = userDetailsService.loadUserByUsername(rt.getUser().getIdentificacion());
 
         String newAccessToken    = jwtService.generateToken(userDetails);
         RefreshToken newRt       = refreshTokenService.create(rt.getUser());  // rotacion

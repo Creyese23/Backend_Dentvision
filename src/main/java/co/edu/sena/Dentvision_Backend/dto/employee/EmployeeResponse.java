@@ -21,5 +21,6 @@ public class EmployeeResponse {
     private String apellidos;
     private String documento;
     private String telefono;
+    private String especialidad;
     private String estado;
 }
