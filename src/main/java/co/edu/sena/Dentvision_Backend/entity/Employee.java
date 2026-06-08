@@ -36,7 +36,7 @@ public class Employee {
 
     // unique = true: no puede existir dos empleados con el mismo documento
     @Column(nullable = false, length = 50, unique = true)
-    private String documento;
+    private String identificacion;
 
     @Column(length = 40)
     private String telefono;
