@@ -42,7 +42,10 @@ public class UserService {
         }
 
         User user = User.builder()
+                .tipoIdentificacion(request.getTipoIdentificacion())
                 .identificacion(request.getIdentificacion())
+                .nombres(request.getNombres())
+                .apellidos(request.getNombres())
                 .email(request.getEmail())
                 .password(hashPassword(request.getPassword()))
                 .estado(request.getEstado() != null ? request.getEstado() : "ACTIVO")
