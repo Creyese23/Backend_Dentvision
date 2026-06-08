@@ -34,13 +34,16 @@ public class AuthService {
     @Transactional
     public AuthResponse register(RegisterRequest request) {
 
-        if (userRepository.existsByUsername(request.username())
+        if (userRepository.existsByUsername(request.identificacion())
                 || userRepository.existsByEmail(request.email())) {
             throw new DuplicateResourceException("El usuario ya está registrado");
         }
 
         User user = User.builder()
-                .username(request.username())
+                .tipoIdentificacion(request.tipoIdentificacion())
+                .identificacion(request.identificacion())
+                .nombres(request.nombres())
+                .apellidos(request.apellidos())
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .role(Role.USER)
@@ -80,7 +83,7 @@ public class AuthService {
 
     private UserDetails buildUserDetails(User user) {
         return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
+                user.getEmail(),
                 user.getPassword(),
                 List.of(new SimpleGrantedAuthority(user.getRole().name()))
         );
