@@ -45,7 +45,7 @@ public class UserService {
                 .tipoIdentificacion(request.getTipoIdentificacion())
                 .identificacion(request.getIdentificacion())
                 .nombres(request.getNombres())
-                .apellidos(request.getNombres())
+                .apellidos(request.getApellidos())
                 .email(request.getEmail())
                 .password(hashPassword(request.getPassword()))
                 .estado(request.getEstado() != null ? request.getEstado() : "ACTIVO")
