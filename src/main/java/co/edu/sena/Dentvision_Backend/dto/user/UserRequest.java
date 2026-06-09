@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class UserRequest {
 
     @NotBlank(message = "El tipo de identificacion es requerido")
-    @Size(min = 2, max = 60, message = "El tipo de identificacion debe tener entre 3 y 60 caracteres")
+    @Size(max = 50, message = "El tipo de identificacion debe tener 50 caracteres")
     private String tipoIdentificacion;
 
     @NotBlank(message = "La identificacion de usuario es requerido")

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 public record RegisterRequest(
         @NotBlank(message = "El tipo de identificacion es obligatorio")
-        @Size(min = 3, max = 50, message = "El username debe tener entre 3 y 50 caracteres")
+        @Size(max = 50, message = "Tipo de identificacion debe tener 50 caracteres")
         String tipoIdentificacion,
 
         @NotBlank(message = "La identificacion es obligatorio")
