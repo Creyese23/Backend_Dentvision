@@ -1,11 +1,15 @@
 package co.edu.sena.Dentvision_Backend;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class DentvisionApiApplication {
+
+    private static final Logger log = LoggerFactory.getLogger(DentvisionApiApplication.class);
 
     public static void main(String[] args) {
         loadDotEnv();
@@ -42,7 +46,7 @@ public class DentvisionApiApplication {
             }
 
         } catch (Exception ex) {
-            System.out.println("[dotenv] No se pudo cargar el archivo .env: " + ex.getMessage());
+            log.warn("[dotenv] No se pudo cargar el archivo .env: {}", ex.getMessage());
         }
     }
 }
