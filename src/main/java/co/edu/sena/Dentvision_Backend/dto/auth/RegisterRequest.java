@@ -9,8 +9,8 @@ public record RegisterRequest(
         @Size(max = 50, message = "Tipo de identificacion debe tener 50 caracteres")
         String tipoIdentificacion,
 
-        @NotBlank(message = "La identificacion es obligatorio")
-        @Size(max = 10, message = "El username debe tener 10 caracteres")
+        @NotBlank(message = "La identificacion es obligatoria")
+        @Size(max = 20, message = "La identificación no puede superar 20 caracteres")
         String identificacion,
 
         @NotBlank(message = "El nombre de usuario es requerido")
@@ -18,7 +18,7 @@ public record RegisterRequest(
         String nombres,
 
         @NotBlank(message = "El apellido de usuario es requerido")
-        @Size(min = 3, max = 60, message = "La identificacion debe tener entre 3 y 60 caracteres")
+        @Size(min = 3, max = 60, message = "El apellido debe tener entre 3 y 60 caracteres")
         String apellidos,
 
         @NotBlank(message = "El email es obligatorio")

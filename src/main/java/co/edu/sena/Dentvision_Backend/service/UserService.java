@@ -101,11 +101,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    /** Evita re-hashear una contraseña que ya es un hash bcrypt. */
     private String hashPassword(String password) {
-        if (password != null && password.matches("^\\$2[aby]\\$\\d{2}\\$.{53}$")) {
-            return password;
-        }
         return passwordEncoder.encode(password);
     }
 
