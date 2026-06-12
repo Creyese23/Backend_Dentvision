@@ -24,14 +24,14 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public List<UserResponse> findAll() {
-        return userRepository.findAll().stream()
+        return userRepository.findAllActive().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     public UserResponse findById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id "));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id " + id));
         return mapToResponse(user);
     }
 

@@ -20,13 +20,13 @@ public class SupplyService {
     private final SupplyRepository supplyRepository;
 
     public List<SupplyResponse> findAll() {
-        return supplyRepository.findAll().stream()
+        return supplyRepository.findAllActive().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     public SupplyResponse findById(Long id) {
-        Supply supply = supplyRepository.findById(id)
+        Supply supply = supplyRepository.findActiveById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Insumo no encontrado con id " + id));
         return mapToResponse(supply);
     }

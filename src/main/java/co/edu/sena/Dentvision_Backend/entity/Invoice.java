@@ -30,6 +30,15 @@ public class Invoice {
     @Column(name = "fecha_emision")
     private LocalDate fechaEmision;
 
+    @Column(name = "fecha_vencimiento")
+    private LocalDate fechaVencimiento;
+
+    @Column(nullable = false, length = 50)
+    private String estado;
+
+    @Column(length = 500)
+    private String descripcion;
+
     @CreatedDate
     @Column(name = "fecha_creacion", updatable = false)
     private LocalDateTime fechaCreacion;

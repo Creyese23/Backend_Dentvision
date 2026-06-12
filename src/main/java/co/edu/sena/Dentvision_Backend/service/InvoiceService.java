@@ -3,8 +3,10 @@ package co.edu.sena.Dentvision_Backend.service;
 import co.edu.sena.Dentvision_Backend.dto.invoice.InvoiceRequest;
 import co.edu.sena.Dentvision_Backend.dto.invoice.InvoiceResponse;
 import co.edu.sena.Dentvision_Backend.entity.Invoice;
+import co.edu.sena.Dentvision_Backend.entity.Patient;
 import co.edu.sena.Dentvision_Backend.exception.ResourceNotFoundException;
 import co.edu.sena.Dentvision_Backend.repository.InvoiceRepository;
+import co.edu.sena.Dentvision_Backend.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 public class InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
+    private final PatientRepository patientRepository;
 
     public List<InvoiceResponse> findAll() {
         return invoiceRepository.findAll().stream()
@@ -32,8 +35,15 @@ public class InvoiceService {
     }
 
     public InvoiceResponse create(InvoiceRequest request) {
+        Patient patient = patientRepository.findById(request.getIdPaciente())
+                .orElseThrow(() -> new ResourceNotFoundException("Paciente no encontrado con id " + request.getIdPaciente()));
+
         Invoice invoice = Invoice.builder()
+                .paciente(patient)
                 .fechaEmision(request.getFechaEmision())
+                .fechaVencimiento(request.getFechaVencimiento())
+                .estado(request.getEstado())
+                .descripcion(request.getDescripcion())
                 .build();
 
         return mapToResponse(invoiceRepository.save(invoice));
@@ -43,8 +53,14 @@ public class InvoiceService {
         Invoice invoice = invoiceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Factura no encontrada con id " + id));
 
+        Patient patient = patientRepository.findById(request.getIdPaciente())
+                .orElseThrow(() -> new ResourceNotFoundException("Paciente no encontrado con id " + request.getIdPaciente()));
+
+        invoice.setPaciente(patient);
         invoice.setFechaEmision(request.getFechaEmision());
-        // estado/descripcion mapping intentionally omitted (no matching builder/mutator present)
+        invoice.setFechaVencimiento(request.getFechaVencimiento());
+        invoice.setEstado(request.getEstado());
+        invoice.setDescripcion(request.getDescripcion());
 
         return mapToResponse(invoiceRepository.save(invoice));
     }
@@ -59,7 +75,9 @@ public class InvoiceService {
         return InvoiceResponse.builder()
                 .id(invoice.getId())
                 .fechaEmision(invoice.getFechaEmision())
-                // estado/descripcion not mapped: corresponding accessors not available on Invoice
+                .fechaVencimiento(invoice.getFechaVencimiento())
+                .estado(invoice.getEstado())
+                .descripcion(invoice.getDescripcion())
                 .fechaCreacion(invoice.getFechaCreacion())
                 .fechaActualizacion(invoice.getFechaActualizacion())
                 .build();

@@ -15,6 +15,9 @@ import java.time.LocalDate;
 @Builder
 public class InvoiceRequest {
 
+    @NotNull(message = "El paciente es requerido")
+    private Long idPaciente;
+
     @NotNull(message = "La fecha de emisión es requerida")
     private LocalDate fechaEmision;
 
