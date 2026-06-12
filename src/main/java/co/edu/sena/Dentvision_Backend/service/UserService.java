@@ -68,7 +68,10 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
+        if (request.getTipoIdentificacion() != null) user.setTipoIdentificacion(request.getTipoIdentificacion());
         user.setIdentificacion(request.getIdentificacion());
+        if (request.getNombres() != null) user.setNombres(request.getNombres());
+        if (request.getApellidos() != null) user.setApellidos(request.getApellidos());
         user.setEmail(request.getEmail());
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(hashPassword(request.getPassword()));
@@ -110,6 +113,8 @@ public class UserService {
                 .id(user.getId())
                 .tipoIdentificacion(user.getTipoIdentificacion())
                 .identificacion(user.getIdentificacion())
+                .nombres(user.getNombres())
+                .apellidos(user.getApellidos())
                 .email(user.getEmail())
                 .role(user.getRole() != null ? user.getRole().name() : null)
                 .estado(user.getEstado())

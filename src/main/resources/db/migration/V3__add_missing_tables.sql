@@ -105,6 +105,18 @@ CREATE TABLE IF NOT EXISTS entregas (
     CONSTRAINT fk_entregas_orden FOREIGN KEY (id_orden) REFERENCES ordenes(id)
 );
 
+-- Roles clínicos asignados a empleados (junction table)
+CREATE TABLE IF NOT EXISTS empleado_roles (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id_empleado BIGINT NOT NULL,
+    id_rol      BIGINT NOT NULL,
+    created_at  DATETIME,
+    updated_at  DATETIME,
+    CONSTRAINT uk_empleado_rol  UNIQUE (id_empleado, id_rol),
+    CONSTRAINT fk_er_empleado   FOREIGN KEY (id_empleado) REFERENCES empleados(id),
+    CONSTRAINT fk_er_rol        FOREIGN KEY (id_rol)      REFERENCES roles(id)
+);
+
 -- Movimientos de inventario (entradas/salidas de insumos)
 CREATE TABLE IF NOT EXISTS movimientos_inventario (
     id              BIGINT AUTO_INCREMENT PRIMARY KEY,

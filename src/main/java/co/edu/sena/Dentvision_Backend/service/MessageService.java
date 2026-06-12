@@ -2,13 +2,16 @@ package co.edu.sena.Dentvision_Backend.service;
 
 import co.edu.sena.Dentvision_Backend.dto.message.MessageRequest;
 import co.edu.sena.Dentvision_Backend.dto.message.MessageResponse;
+import co.edu.sena.Dentvision_Backend.entity.Conversation;
 import co.edu.sena.Dentvision_Backend.entity.Message;
 import co.edu.sena.Dentvision_Backend.exception.ResourceNotFoundException;
+import co.edu.sena.Dentvision_Backend.repository.ConversationRepository;
 import co.edu.sena.Dentvision_Backend.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
 public class MessageService {
 
     private final MessageRepository messageRepository;
+    private final ConversationRepository conversationRepository;
 
     public List<MessageResponse> findAll() {
         return messageRepository.findAll().stream()
@@ -32,9 +36,15 @@ public class MessageService {
     }
 
     public MessageResponse create(MessageRequest request) {
+        Conversation conversation = conversationRepository.findById(request.getIdConversacion())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Conversación no encontrada con id " + request.getIdConversacion()));
+
         Message message = Message.builder()
                 .contenido(request.getContenido())
                 .remitente(request.getRemitente())
+                .fechaHora(LocalDateTime.now())
+                .conversacion(conversation)
                 .build();
 
         return mapToResponse(messageRepository.save(message));
@@ -44,8 +54,13 @@ public class MessageService {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Mensaje no encontrado con id " + id));
 
+        Conversation conversation = conversationRepository.findById(request.getIdConversacion())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Conversación no encontrada con id " + request.getIdConversacion()));
+
         message.setContenido(request.getContenido());
         message.setRemitente(request.getRemitente());
+        message.setConversacion(conversation);
 
         return mapToResponse(messageRepository.save(message));
     }
@@ -61,6 +76,8 @@ public class MessageService {
                 .id(message.getId())
                 .contenido(message.getContenido())
                 .remitente(message.getRemitente())
+                .idConversacion(message.getConversacion().getId())
+                .fechaHora(message.getFechaHora())
                 .build();
     }
 }

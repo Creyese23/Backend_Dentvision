@@ -32,8 +32,14 @@ public class Supply {
     @Column(length = 500)
     private String descripcion;
 
+    @Column(name = "stock_actual")
+    private Integer stockActual;
+
     @Column(name = "stock_minimo")
     private Integer stockMinimo;
+
+    @Column(name = "precio_unitario", precision = 12, scale = 2)
+    private java.math.BigDecimal precioUnitario;
 
     @Column(name = "unidad_medida", length = 50)
     private String unidadMedida;

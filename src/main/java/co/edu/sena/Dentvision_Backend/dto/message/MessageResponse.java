@@ -16,6 +16,6 @@ public class MessageResponse {
     private Long id;
     private String contenido;
     private String remitente;
-    private String destinatario;
-    private LocalDateTime fechaCreacion;
+    private Long idConversacion;
+    private LocalDateTime fechaHora;
 }
