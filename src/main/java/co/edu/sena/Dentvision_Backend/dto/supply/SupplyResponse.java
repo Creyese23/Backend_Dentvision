@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -16,7 +17,9 @@ public class SupplyResponse {
     private Long id;
     private String nombre;
     private String descripcion;
+    private Integer stockActual;
     private Integer stockMinimo;
+    private BigDecimal precioUnitario;
     private String unidadMedida;
     private String estado;
     private LocalDateTime fechaCreacion;

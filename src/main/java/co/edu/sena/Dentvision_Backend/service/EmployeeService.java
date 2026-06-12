@@ -73,6 +73,7 @@ public class EmployeeService {
         employee.setApellidos(request.getApellidos());
         employee.setIdentificacion(request.getIdentificacion());
         employee.setTelefono(request.getTelefono());
+        if (request.getEspecialidad() != null) employee.setEspecialidad(request.getEspecialidad());
         if (request.getEstado() != null) {
             employee.setEstado(request.getEstado());
         }
@@ -96,6 +97,7 @@ public class EmployeeService {
                 .apellidos(employee.getApellidos())
                 .identificacion(employee.getIdentificacion())
                 .telefono(employee.getTelefono())
+                .especialidad(employee.getEspecialidad())
                 .estado(employee.getEstado())
                 .build();
     }

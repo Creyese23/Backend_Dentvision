@@ -35,7 +35,9 @@ public class SupplyService {
         Supply supply = Supply.builder()
                 .nombre(request.getNombre())
                 .descripcion(request.getDescripcion())
+                .stockActual(request.getStockActual() != null ? request.getStockActual() : 0)
                 .stockMinimo(request.getStockMinimo())
+                .precioUnitario(request.getPrecioUnitario())
                 .unidadMedida(request.getUnidadMedida())
                 .estado(request.getEstado() != null ? request.getEstado() : "ACTIVO")
                 .build();
@@ -49,11 +51,11 @@ public class SupplyService {
 
         supply.setNombre(request.getNombre());
         supply.setDescripcion(request.getDescripcion());
-        supply.setStockMinimo(request.getStockMinimo());
+        if (request.getStockActual() != null) supply.setStockActual(request.getStockActual());
+        if (request.getStockMinimo() != null) supply.setStockMinimo(request.getStockMinimo());
+        if (request.getPrecioUnitario() != null) supply.setPrecioUnitario(request.getPrecioUnitario());
         supply.setUnidadMedida(request.getUnidadMedida());
-        if (request.getEstado() != null) {
-            supply.setEstado(request.getEstado());
-        }
+        if (request.getEstado() != null) supply.setEstado(request.getEstado());
 
         return mapToResponse(supplyRepository.save(supply));
     }
@@ -70,7 +72,9 @@ public class SupplyService {
                 .id(supply.getId())
                 .nombre(supply.getNombre())
                 .descripcion(supply.getDescripcion())
+                .stockActual(supply.getStockActual())
                 .stockMinimo(supply.getStockMinimo())
+                .precioUnitario(supply.getPrecioUnitario())
                 .unidadMedida(supply.getUnidadMedida())
                 .estado(supply.getEstado())
                 .fechaCreacion(supply.getFechaCreacion())

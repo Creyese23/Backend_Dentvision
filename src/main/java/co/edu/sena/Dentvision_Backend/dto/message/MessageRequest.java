@@ -1,6 +1,7 @@
 package co.edu.sena.Dentvision_Backend.dto.message;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,5 +22,6 @@ public class MessageRequest {
     @Size(min = 1, max = 100, message = "El remitente debe tener entre 1 y 100 caracteres")
     private String remitente;
 
-    private String destinatario;
+    @NotNull(message = "El id de la conversación es requerido")
+    private Long idConversacion;
 }

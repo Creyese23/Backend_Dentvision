@@ -1,11 +1,14 @@
 package co.edu.sena.Dentvision_Backend.dto.supply;
 
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
@@ -20,7 +23,12 @@ public class SupplyRequest {
     @Size(max = 500, message = "La descripción no puede exceder 500 caracteres")
     private String descripcion;
 
+    private Integer stockActual;
+
     private Integer stockMinimo;
+
+    @DecimalMin(value = "0.0", inclusive = true, message = "El precio unitario no puede ser negativo")
+    private BigDecimal precioUnitario;
 
     @Size(max = 50, message = "La unidad de medida no puede exceder 50 caracteres")
     private String unidadMedida;
