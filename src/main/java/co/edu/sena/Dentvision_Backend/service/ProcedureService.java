@@ -26,7 +26,7 @@ public class ProcedureService {
     private final EmployeeRepository employeeRepository;
 
     public List<ProcedureResponse> findAll() {
-        return procedureRepository.findAll().stream()
+        return procedureRepository.findAllActive().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

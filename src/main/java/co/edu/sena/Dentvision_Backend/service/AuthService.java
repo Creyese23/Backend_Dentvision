@@ -7,6 +7,7 @@ import co.edu.sena.Dentvision_Backend.entity.RefreshToken;
 import co.edu.sena.Dentvision_Backend.entity.Role;
 import co.edu.sena.Dentvision_Backend.entity.User;
 import co.edu.sena.Dentvision_Backend.exception.DuplicateResourceException;
+import co.edu.sena.Dentvision_Backend.exception.ResourceNotFoundException;
 import co.edu.sena.Dentvision_Backend.repository.UserRepository;
 import co.edu.sena.Dentvision_Backend.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -73,7 +74,7 @@ public class AuthService {
         String accessToken = jwtService.generateToken(userDetails);
 
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         RefreshToken refreshToken = refreshTokenService.create(user);
 

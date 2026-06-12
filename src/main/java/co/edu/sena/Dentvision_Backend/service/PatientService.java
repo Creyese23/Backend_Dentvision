@@ -40,29 +40,20 @@ public class PatientService {
 
     // ─── Consultas ────────────────────────────────────────────────────────────
 
-    /** Lista todos los pacientes sin paginar (mantiene compatibilidad). */
+    /** Lista todos los pacientes activos sin paginar (mantiene compatibilidad). */
     @Transactional(readOnly = true)
     public List<PatientResponse> findAll() {
-        log.debug("Consultando todos los pacientes");
-        return patientRepository.findAll()
+        log.debug("Consultando todos los pacientes activos");
+        return patientRepository.findAllActive()
                 .stream()
                 .map(patientMapper::toResponse)
                 .toList();
     }
 
-    /**
-     * Lista pacientes con paginación.
-     *
-     * Ejemplo de llamada desde el controlador:
-     * <pre>
-     *   Pageable pageable = PageRequest.of(page, size, Sort.by("apellidos"));
-     *   return patientService.findAll(pageable);
-     * </pre>
-     */
     @Transactional(readOnly = true)
     public PageResponse<PatientResponse> findAll(Pageable pageable) {
         log.debug("Consultando pacientes — página {}, tamaño {}", pageable.getPageNumber(), pageable.getPageSize());
-        Page<PatientResponse> page = patientRepository.findAll(pageable)
+        Page<PatientResponse> page = patientRepository.findAllActive(pageable)
                 .map(patientMapper::toResponse);
         return PageResponse.of(page);
     }

@@ -35,9 +35,6 @@ public class RefreshTokenService {
      * Revoca los anteriores para evitar tokens huerfanos (rotacion de tokens).
      */
     public RefreshToken create(User user) {
-        // Revocar tokens anteriores antes de crear uno nuevo (token rotation)
-        refreshTokenRepository.revokeAllByUser(user);
-
         RefreshToken rt = RefreshToken.builder()
                 .token(UUID.randomUUID().toString())
                 .user(user)
@@ -45,7 +42,9 @@ public class RefreshTokenService {
                 .revoked(false)
                 .build();
 
+        // Guardar primero el nuevo token; revocar los anteriores solo si el save fue exitoso
         RefreshToken saved = refreshTokenRepository.save(rt);
+        refreshTokenRepository.revokeAllByUserExceptId(user, saved.getId());
         log.debug("Refresh token creado para usuario id={}", user.getId());
         return saved;
     }

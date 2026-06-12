@@ -24,7 +24,7 @@ public class EmployeeService {
     private final UserRepository userRepository;
 
     public List<EmployeeResponse> findAll() {
-        return employeeRepository.findAll().stream()
+        return employeeRepository.findAllActive().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

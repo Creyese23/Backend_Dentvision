@@ -26,7 +26,7 @@ public class AppointmentManagementService {
     private final EmployeeRepository employeeRepository;
 
     public List<AppointmentResponse> findAll() {
-        return appointmentRepository.findAll().stream()
+        return appointmentRepository.findAllActive().stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
